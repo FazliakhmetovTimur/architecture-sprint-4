@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+
+title C4 Диаграмма последовательности кеширования нового заказа
+
+Container(eventBus, "Message queue", "Rabbit", "Шина данных")
+
+Container_Boundary(MES, "Система управления производством")
+    Container(mesUI, "MES", "React, Typescript", "UI for MES")
+    Container(mesAPI, "MES API", "C#", "Show list of orders")
+    Container(cash, "Сash", "Java", "Кеша для новых запросов")
+    Container(mesDB, "MES DB", "PostgreSQL", "База данных MES")
+Boundary_End()
+
+Rel(eventBus, mesAPI, "Создан новый заказ")
+Rel(mesAPI, cash, "Создать новый заказ")
+Rel(cash, mesDB, "Создать новый заказ")
+Rel(mesDB, cash, "Новый заказ создан в БД")
+Rel(mesUI, mesAPI, "Запросить список новых заказов (зайти на первую страницу)")
+Rel(mesAPI, cash, "Получить список новых заказов")
+Rel(mesAPI, mesUI, "Вернуть список новых заказов")
+Rel(mesUI, mesAPI, "Обновить статус нового заказа")
+Rel(mesAPI, cash, "Инвалидировать кеш")
+Rel(mesAPI, mesDB, "Обновить статус нового заказа в БД")
+
+@enduml
